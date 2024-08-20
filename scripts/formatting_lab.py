@@ -32,7 +32,7 @@ def main(input_path, output_path):
     ]
 
     output_open = open(output_path, "w", newline="")
-    output_writer = csv.DictWriter(output_open, fieldnames=header_full)
+    output_writer = csv.DictWriter(output_open, fieldnames=header_full, dialect="unix")
     output_writer.writeheader()
 
     def format_options(input_row, allele):
