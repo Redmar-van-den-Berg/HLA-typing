@@ -41,6 +41,11 @@ def main(input_path, output_path):
         # determine the hla gene so it can be included in all options for
         # correct nomenclature
         hla_gene = input_row[allele].split("*")[0]
+
+        # If the cell is empty
+        if not hla_gene:
+            return ""
+
         i = 0
         # split multiple genotype options
         for option in input_row[allele].split("/"):
