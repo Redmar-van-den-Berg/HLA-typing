@@ -1,45 +1,89 @@
+import argparse
 import csv
 from HLA import HLA
 
-### use this script to replace HLA alleles with incorrect nomenclature with 'X'
-### support for 'X' alleles is currently removed from HLA_check.py but can be added back
 
-header_full = ['sample_name', 'HLA-A', 'HLA-A (2)', 'HLA-B', 'HLA-B (2)', 'HLA-C', 'HLA-C (2)',
-    'HLA-DRB1', 'HLA-DRB1 (2)', 'HLA-DRB3', 'HLA-DRB3 (2)', 'HLA-DRB4', 'HLA-DRB4 (2)',
-    'HLA-DRB5', 'HLA-DRB5 (2)', 'HLA-DQA1', 'HLA-DQA1 (2)', 'HLA-DQB1', 'HLA-DQB1 (2)',
-    'HLA-DPB1', 'HLA-DPB1 (2)']
+header_full = [
+    "sample_name",
+    "HLA-A",
+    "HLA-A (2)",
+    "HLA-B",
+    "HLA-B (2)",
+    "HLA-C",
+    "HLA-C (2)",
+    "HLA-DRB1",
+    "HLA-DRB1 (2)",
+    "HLA-DRB3",
+    "HLA-DRB3 (2)",
+    "HLA-DRB4",
+    "HLA-DRB4 (2)",
+    "HLA-DRB5",
+    "HLA-DRB5 (2)",
+    "HLA-DQA1",
+    "HLA-DQA1 (2)",
+    "HLA-DQB1",
+    "HLA-DQB1 (2)",
+    "HLA-DPB1",
+    "HLA-DPB1 (2)",
+]
 
-#formatted-hla-type.csv: lab output, parsed into the correct format (e.g. HLA-A*01:02/HLA-A*01:03)
-formatted_path = '/exports/me-lcco-aml-hpc/cavanandel/HLA-typing/output-formatted/lab/formatted-hla-type.csv'
-formatted_open = open(formatted_path, 'r', newline='')
-formatted_reader = csv.DictReader(formatted_open, delimiter=',', fieldnames=header_full)
-next(formatted_reader) #skip header
 
-#correct-nomen-hla-type.csv: lab output excluding alleles with incorrect nomenclature
-output_path = '/exports/me-lcco-aml-hpc/cavanandel/HLA-typing/output-formatted/lab/correct-nomen-hla-type.csv'
-output_open = open(output_path, 'w', newline='')
-output_writer = csv.DictWriter(output_open, delimiter=',', fieldnames=header_full)
-output_writer.writeheader()
+def main(input_file, output_path, incorrect_path):
+    # formatted-hla-type.csv: lab output, parsed into the correct format (e.g. HLA-A*01:02/HLA-A*01:03)
+    formatted_path = input_file
+    formatted_open = open(formatted_path, "r", newline="")
+    formatted_reader = csv.DictReader(
+        formatted_open, delimiter=",", fieldnames=header_full
+    )
+    next(formatted_reader)  # skip header
 
-incorrect_path = '/exports/me-lcco-aml-hpc/cavanandel/HLA-typing/output-formatted/lab/incorrect-nomen-hla-type.txt'
-incorrect_file = open(incorrect_path, 'w')
-incorrect_file.write('Alleles with incorrect nomenclature:\n')
+    # correct-nomen-hla-type.csv: lab output excluding alleles with incorrect nomenclature
+    output_open = open(output_path, "w", newline="")
+    output_writer = csv.DictWriter(output_open, delimiter=",", fieldnames=header_full)
+    output_writer.writeheader()
 
-#try to create an hla class for each allele, report errors (due to incorrect nomenclature)
-for input_row in formatted_reader:
-    output_row = {column: '' for column in header_full} #create empty output row
-    output_row['sample_name'] = input_row['sample_name']
-    for allele in header_full[1:]:
-        hla_incorrect = False #variable to check that all options have correct nomenclature
-        for option in input_row[allele].split('/'):
-            if option != '':
-                try: 
-                    hla = str(HLA.from_str(option)) #test if hla class can be created, then return string again
-                except ValueError: #incorrect nomenclature > hla class cannot be created
-                    hla_incorrect = True
-        if not hla_incorrect: #only if all options have correct nomenclature, print hla_options
-            output_row[allele] = input_row[allele]
-        else: 
-            output_row[allele] = 'X'
-            incorrect_file.write(f'{input_row["sample_name"]} - {input_row[allele]}\n')
-    output_writer.writerow(output_row)
+    incorrect_file = open(incorrect_path, "w")
+    incorrect_file.write("Alleles with incorrect nomenclature:\n")
+
+    # try to create an hla class for each allele, report errors (due to incorrect nomenclature)
+    for input_row in formatted_reader:
+        # create empty output row
+        output_row = {column: "" for column in header_full}
+        output_row["sample_name"] = input_row["sample_name"]
+        for allele in header_full[1:]:
+            # variable to check that all options have correct nomenclature
+            hla_incorrect = False
+            for option in input_row[allele].split("/"):
+                if option != "":
+                    try:
+                        # test if hla class can be created, then return string again
+                        hla = str(HLA.from_str(option))
+                    # incorrect nomenclature > hla class cannot be created
+                    except ValueError as e:
+                        print(e)
+                        hla_incorrect = True
+            # only if all options have correct nomenclature, print hla_options
+            if not hla_incorrect:
+                output_row[allele] = input_row[allele]
+            else:
+                output_row[allele] = "X"
+                incorrect_file.write(
+                    f'{input_row["sample_name"]} - {input_row[allele]}\n'
+                )
+        output_writer.writerow(output_row)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="""
+    Use this script to replace HLA alleles with incorrect nomenclature with 'X'
+    support for 'X' alleles is currently removed from HLA_check.py but can be added back
+    """
+    )
+
+    parser.add_argument("input", help="Formatted HLA input file")
+    parser.add_argument("output", help="File to write correct HLA nomenlcature to")
+    parser.add_argument("incorrect", help="File to write incorrect HLA nomenclature to")
+
+    args = parser.parse_args()
+    main(args.input, args.output, args.incorrect)
