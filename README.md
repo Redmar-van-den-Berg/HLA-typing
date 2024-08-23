@@ -1,7 +1,7 @@
-[![Continuous Integration](https://github.com/Carovanandel/HLA-typing/actions/workflows/ci.yml/badge.svg)](https://github.com/Carovanandel/HLA-typing/actions/workflows/ci.yml)
+[![Continuous Integration](https://github.com/Redmar-van-den-Berg/HLA-typing/actions/workflows/ci.yml/badge.svg)](https://github.com/Redmar-van-den-Berg/HLA-typing/actions/workflows/ci.yml)
 [![PEP compatible](http://pepkit.github.io/img/PEP-compatible-green.svg)](http://pep.databio.org)
-![GitHub release](https://img.shields.io/github/v/release/Carovanandel/HLA-typing)
-![Commits since latest release](https://img.shields.io/github/commits-since/Carovanandel/HLA-typing/latest)
+![GitHub release](https://img.shields.io/github/v/release/Redmar-van-den-Berg/HLA-typing)
+![Commits since latest release](https://img.shields.io/github/commits-since/Redmar-van-den-Berg/HLA-typing/latest)
 
 # HLA-typing
 Snakemake file and python scripts for HLA-typing benchmark project
@@ -9,7 +9,7 @@ Snakemake file and python scripts for HLA-typing benchmark project
 ## Installation
 Download the repository from github
 ```bash
-git clone https://github.com/Carovanandel/HLA-typing.git
+git clone https://github.com/Redmar-van-den-Berg/HLA-typing.git
 ```
 
 Install and activate the
