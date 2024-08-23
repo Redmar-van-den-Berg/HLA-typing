@@ -31,25 +31,29 @@ rule all:
 
 rule T1K:
     input:
-        f=get_forward,
-        r=get_reverse,
+        bam=get_bam,
         reference=config["T1K_fasta"],
+        coordinates=config["T1K_coordinates"],
     output:
         allele="output/{sample}/T1K/{sample}_allele.tsv",
         genotype="output/{sample}/T1K/{sample}_genotype.tsv",
+    params:
+        alleles="A B C DRB1 DRB3 DRB4 DRB5 DQA1 DQB1 DPB1"
     log:
         "output/log/{sample}.T1K.txt",
     benchmark:
         repeat("benchmarks/T1K_{sample}.tsv", config["repeat"])
     container:
         containers["T1K"]
-    threads: 1
+    threads: 8
     shell:
         """
         run-t1k \
-            -1 {input.f} \
-            -2 {input.r} \
+            -b {input.bam} \
+            -c {input.coordinates} \
             -o {wildcards.sample} \
+            --alleleWhitelist "{params.alleles}" \
+            --abnormalUnmapFlag \
             --od $(dirname {output.allele}) \
             -t {threads} \
             --preset hla \
